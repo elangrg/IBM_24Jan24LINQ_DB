@@ -45,7 +45,8 @@ namespace IBM_24Jan24LINQ_DB
                 }
                 if (choice == "2")
                 {
-                    
+                    AddNewEmployee(_cn);
+
 
                 }
 
@@ -68,6 +69,38 @@ namespace IBM_24Jan24LINQ_DB
             } while (choice != "0");
 
 
+
+        }
+
+        private static void AddNewEmployee(SqlConnection _cn)
+        { 
+            Console.Clear ();
+            Console.WriteLine( "Enter Employee Details to Insert");
+            Console.Write("Emp Name  :"  );
+            string _enm = Console.ReadLine();
+            Console.Write("Emp Salary:");
+            decimal _Sal = decimal.Parse( Console.ReadLine());
+
+
+
+            SqlCommand _cmd=new 
+                SqlCommand (cmdText: "INSERT INTO [Employee] ( [EmpName], [Salary]) VALUES ( @empnm,@sal )",
+                connection: _cn);
+
+            _cmd.Parameters.Add("@empnm", SqlDbType.VarChar,50).Value = _enm;
+            _cmd.Parameters.Add("@sal", SqlDbType.Money).Value = _Sal;
+
+
+            _cn.Open();
+
+            if (_cmd.ExecuteNonQuery() > 0)
+                Console.WriteLine("Inserted Successfully!!!\n Press any key to Continue...");
+            else 
+                Console.WriteLine("Something went Worng!!!\n Press any key to Continue...");
+            
+            _cn.Close();
+
+            Console.ReadKey();
 
         }
 
