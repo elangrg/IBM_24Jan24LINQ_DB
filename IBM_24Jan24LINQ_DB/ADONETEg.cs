@@ -52,7 +52,8 @@ namespace IBM_24Jan24LINQ_DB
 
                 if (choice == "3")
                 {
-                  
+                    EditEmployee(_cn);
+
 
                 }
                 if (choice == "4")
@@ -67,6 +68,50 @@ namespace IBM_24Jan24LINQ_DB
                 }
 
             } while (choice != "0");
+
+
+
+        }
+
+        private static void EditEmployee(SqlConnection _cn)
+        {
+            // Display Employees 
+            ListEmployees(_cn) ;
+
+
+            Console.WriteLine("\n\nEnter Employee Details to Seek for Edit" );
+            Console.Write("Emp ID to Seek:");
+            string empID= Console.ReadLine();
+            SeekEmployee(_cn, empID);
+
+
+            Console.WriteLine("Enter Employee Details to Update");
+            Console.Write("New Emp Name  :");
+            string _enm = Console.ReadLine();
+            Console.Write("New Emp Salary:");
+            decimal _Sal = decimal.Parse(Console.ReadLine());
+
+
+
+            SqlCommand _cmd = new
+                SqlCommand(cmdText: "update  [Employee] set  [EmpName]=@empnm, [Salary] =@sal where EmployeeID=@eid",
+                connection: _cn);
+
+            _cmd.Parameters.Add("@empnm", SqlDbType.VarChar, 50).Value = _enm;
+            _cmd.Parameters.Add("@sal", SqlDbType.Money).Value = _Sal;
+            _cmd.Parameters.Add("@eid", SqlDbType.Int).Value = empID;
+
+
+            _cn.Open();
+
+            if (_cmd.ExecuteNonQuery() > 0)
+                Console.WriteLine("Updated Successfully!!!\n Press any key to Continue...");
+            else
+                Console.WriteLine("Something went Worng!!!\n Press any key to Continue...");
+
+            _cn.Close();
+
+            Console.ReadKey();
 
 
 
@@ -134,5 +179,40 @@ namespace IBM_24Jan24LINQ_DB
 
 
         }
+   
+       private static void SeekEmployee(SqlConnection _cn,string EmpID)
+        {
+            SqlCommand _cmd=new SqlCommand ();
+
+            _cmd.Connection = _cn;
+            _cmd.CommandType = CommandType.Text;
+            _cmd.CommandText = $"select * from employee where EmployeeId={EmpID}";
+            
+            _cn.Open();
+           SqlDataReader _drd=     _cmd.ExecuteReader();
+            
+            if (_drd.HasRows==false)
+            { Console.Clear(); Console.Write("Record(s) not found!!!\nPress any key to Continue...");
+                Console.ReadKey();
+                return;
+            }
+                Console.Clear();
+                Console.WriteLine($"EmpID          |EmpName          |Salary");
+                while (_drd.Read())
+                {
+                    Console.WriteLine($"{_drd.GetValue(0)}|{_drd.GetValue(1)}|{_drd.GetValue(2)}");
+                }
+                Console.Write( "Press any key to Continue..." );
+                Console.ReadKey();
+         
+            _drd.Close(); _cn.Close();
+
+
+
+        }
+   
+    
+    
+    
     }
 }
